@@ -21,6 +21,10 @@ class Rock(GameElement):
 class Character(GameElement): # step5
     IMAGE = "Girl"
 
+    def __init__(self):
+        GameElement.__init__(self)
+        self.inventory = []
+
     #step 9 adding instance method
     def next_pos(self, direction):
         if direction == 'up':
@@ -31,7 +35,16 @@ class Character(GameElement): # step5
             return(self.x-1, self.y)
         elif direction == 'right':
             return (self.x+1, self.y)
-    #pass
+
+class Gem(GameElement):
+    IMAGE = "BlueGem"
+    SOLID = False
+
+    def interact(self,player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("you just acquired a gem! you have %d items!"%(len(player.inventory)))
+
+    
 ####   End class definitions    ####
 
 def initialize():
@@ -54,11 +67,17 @@ def initialize():
     #Added character - GIRL for step5    
     global PLAYER
     PLAYER = Character()
+    print PLAYER.inventory
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(2,2,PLAYER)
     #print PLAYER
 
     GAME_BOARD.draw_msg("This game is wicket awesome") # step6
+
+    # Added GEM - step12
+    gem = Gem()
+    GAME_BOARD.register(gem)
+    GAME_BOARD.set_el(3,1,gem)
 
     #step 9
 def keyboard_handler():
@@ -83,6 +102,8 @@ def keyboard_handler():
         next_y = next_location[1]
 
         existing_el = GAME_BOARD.get_el(next_x, next_y)
+        if existing_el:
+            existing_el.interact(PLAYER)
 
         if existing_el is None or not existing_el.SOLID:
             GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
@@ -90,6 +111,9 @@ def keyboard_handler():
         else:
             new_message = "can't move " + direction
             GAME_BOARD.draw_msg(new_message)
+
+
+
 
 
 
