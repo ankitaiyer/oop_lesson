@@ -11,15 +11,15 @@ KEYBOARD = None
 PLAYER = None
 ######################
 #increase the GRID size - step3, step4
-GAME_WIDTH = 5
-GAME_HEIGHT = 5
+GAME_WIDTH = 7
+GAME_HEIGHT = 7
 
 #### Put class definitions here ####
 class Rock(GameElement):
     IMAGE = "Rock"
     SOLID = True
 class Character(GameElement): # step5
-    IMAGE = "Girl"
+    IMAGE = "Horns"
 
     def __init__(self):
         GameElement.__init__(self)
@@ -42,10 +42,89 @@ class Gem(GameElement):
 
     def interact(self,player):
         player.inventory.append(self)
-        GAME_BOARD.draw_msg("you just acquired a gem! you have %d items!"%(len(player.inventory)))
+        GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
 
-    
+class GreenGem(GameElement):
+    IMAGE = "GreenGem"
+    SOLID = False
+
+    def interact(self,player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
+
+class OrangeGem(GameElement):
+    IMAGE = "OrangeGem"
+    SOLID = False
+
+    def interact(self,player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
+
+
+class DoorClosed(GameElement):
+    IMAGE = "DoorClosed"
+    SOLID = True
+
+    def interact(self,player):
+        #if Key in player.inventory:
+        for index in range(len(player.inventory)):
+            if type(player.inventory[index]) == Key:
+                self.SOLID = False
+                del player.inventory[index]
+                player.inventory.append(self)
+                GAME_BOARD.draw_msg("You have used your key to acquire a door! You now have %d items." %(len(player.inventory)))
+                break
+        
+
+class Key(GameElement):
+    IMAGE = "Key"
+    SOLID = False
+
+    def interact(self,player):
+        player.inventory.append(self)
+        GAME_BOARD.draw_msg("You have just acquired a key! You now have %d items." %(len(player.inventory)))
+
+
 ####   End class definitions    ####
+def keyboard_handler():
+    direction = None
+
+    if KEYBOARD[key.UP]:
+        direction = "up"
+        GAME_BOARD.draw_msg("Moving up!")
+    if KEYBOARD[key.DOWN]:
+        direction = "down"  
+        GAME_BOARD.draw_msg("Moving Down!")  
+    if KEYBOARD[key.LEFT]:
+        direction = "left"
+        GAME_BOARD.draw_msg("Moving Left!")
+    if KEYBOARD[key.RIGHT]:
+        direction = "right"
+        GAME_BOARD.draw_msg("Moving Right!")
+
+    if direction:
+        next_location = PLAYER.next_pos(direction)
+        next_x = next_location[0]
+        next_y = next_location[1]
+       
+
+
+        if (0 <= next_x < GAME_WIDTH) and (0 <= next_y < GAME_HEIGHT): 
+            existing_el = GAME_BOARD.get_el(next_x, next_y)
+            
+            if existing_el:
+                existing_el.interact(PLAYER)
+
+            if existing_el is None or not existing_el.SOLID:
+                GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
+                GAME_BOARD.set_el(next_x,next_y,PLAYER)
+            elif type(existing_el) == DoorClosed:
+                GAME_BOARD.draw_msg("You just hit a closed door. You need a key to open and acquire this door.")    
+            else:
+                new_message = "I can't move " + direction + " I see something SOLID"
+                GAME_BOARD.draw_msg(new_message)
+        else:
+            GAME_BOARD.draw_msg("Reached boundries")
 
 def initialize():
     #"""Put game initialization code here"""
@@ -67,56 +146,36 @@ def initialize():
     #Added character - GIRL for step5    
     global PLAYER
     PLAYER = Character()
-    print PLAYER.inventory
     GAME_BOARD.register(PLAYER)
-    GAME_BOARD.set_el(2,2,PLAYER)
-    #print PLAYER
+    GAME_BOARD.set_el(1,5,PLAYER)
 
-    GAME_BOARD.draw_msg("This game is wicket awesome") # step6
+    GAME_BOARD.draw_msg("This game is wicked awesome.") # step6
 
-    # Added GEM - step12
+    # Adding GEMS
     gem = Gem()
     GAME_BOARD.register(gem)
-    GAME_BOARD.set_el(3,1,gem)
+    GAME_BOARD.set_el(0,0,gem)
 
-    #step 9
-def keyboard_handler():
-    direction = None
+    greengem = GreenGem()
+    GAME_BOARD.register(greengem)
+    GAME_BOARD.set_el(1,0,greengem)
 
-    if KEYBOARD[key.UP]:
-        direction = "up"
-        GAME_BOARD.draw_msg("Moving up!")
-    if KEYBOARD[key.DOWN]:
-        direction = "down"  
-        GAME_BOARD.draw_msg("Moving Down!")  
-    if KEYBOARD[key.LEFT]:
-        direction = "left"
-        GAME_BOARD.draw_msg("Moving Left!")
-    if KEYBOARD[key.RIGHT]:
-        direction = "right"
-        GAME_BOARD.draw_msg("Moving Right!")
+    orangegem = OrangeGem()
+    GAME_BOARD.register(orangegem)
+    GAME_BOARD.set_el(2,0,orangegem)
 
-    if direction:
-        next_location = PLAYER.next_pos(direction)
-        next_x = next_location[0]
-        next_y = next_location[1]
+    doorclosed = DoorClosed()
+    GAME_BOARD.register(doorclosed)
+    GAME_BOARD.set_el(3,3,doorclosed)
 
-        if (0 <= next_x <= GAME_WIDTH) and (0 <= next_y <= GAME_HEIGHT): 
-            existing_el = GAME_BOARD.get_el(next_x, next_y)
-            if existing_el:
-                existing_el.interact(PLAYER)
-
-            if existing_el is None or not existing_el.SOLID:
-                GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
-                GAME_BOARD.set_el(next_x,next_y,PLAYER)
-            else:
-                new_message = "can't move " + direction
-                GAME_BOARD.draw_msg(new_message)
-        else:
-            GAME_BOARD.draw_msg("Reached boundries")
+    key1 = Key()
+    GAME_BOARD.register(key1)
+    GAME_BOARD.set_el(6,6,key1)
 
 
+  
 
+            
 
 
 
