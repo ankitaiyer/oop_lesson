@@ -101,17 +101,19 @@ def keyboard_handler():
         next_x = next_location[0]
         next_y = next_location[1]
 
-        existing_el = GAME_BOARD.get_el(next_x, next_y)
-        if existing_el:
-            existing_el.interact(PLAYER)
+        if (0 <= next_x <= GAME_WIDTH) and (0 <= next_y <= GAME_HEIGHT): 
+            existing_el = GAME_BOARD.get_el(next_x, next_y)
+            if existing_el:
+                existing_el.interact(PLAYER)
 
-        if existing_el is None or not existing_el.SOLID:
-            GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
-            GAME_BOARD.set_el(next_x,next_y,PLAYER)
+            if existing_el is None or not existing_el.SOLID:
+                GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
+                GAME_BOARD.set_el(next_x,next_y,PLAYER)
+            else:
+                new_message = "can't move " + direction
+                GAME_BOARD.draw_msg(new_message)
         else:
-            new_message = "can't move " + direction
-            GAME_BOARD.draw_msg(new_message)
-
+            GAME_BOARD.draw_msg("Reached boundries")
 
 
 
