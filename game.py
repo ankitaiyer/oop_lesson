@@ -18,6 +18,7 @@ GAME_HEIGHT = 7
 class Rock(GameElement):
     IMAGE = "Rock"
     SOLID = True
+
 class Character(GameElement): # step5
     IMAGE = "Horns"
 
@@ -39,10 +40,19 @@ class Character(GameElement): # step5
 class Gem(GameElement):
     IMAGE = "BlueGem"
     SOLID = False
+    
 
     def interact(self,player):
         player.inventory.append(self)
+        gem_counter =  1
         GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
+        #if GEM in player.inventory:
+        for index in range(len(player.inventory)):
+            if type(player.inventory[index]) == OrangeGem or type(player.inventory[index])== GreenGem:
+                gem_counter = gem_counter + 1
+                if gem_counter == 3:
+                    GAME_BOARD.draw_msg("Wow! I am a princess now!")
+                         
 
 class GreenGem(GameElement):
     IMAGE = "GreenGem"
@@ -50,7 +60,17 @@ class GreenGem(GameElement):
 
     def interact(self,player):
         player.inventory.append(self)
+        gem_counter = 1
         GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
+        for index in range(len(player.inventory)):
+            if type(player.inventory[index]) == OrangeGem or type(player.inventory[index]) == Gem:
+                gem_counter = gem_counter + 1
+                if gem_counter == 3:
+                    # when all 3 gems are found a girl turns into a princess
+                    player.IMAGE == "Princess"
+                    GAME_BOARD.register(player)
+                    GAME_BOARD.set_el(player.x,player.y,player)
+                    GAME_BOARD.draw_msg("Wow! I am a princess now!")
 
 class OrangeGem(GameElement):
     IMAGE = "OrangeGem"
@@ -58,8 +78,18 @@ class OrangeGem(GameElement):
 
     def interact(self,player):
         player.inventory.append(self)
+        gem_counter = 1
         GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
-
+        for index in range(len(player.inventory)):
+            if type(player.inventory[index]) == GreenGem or type(player.inventory[index]) == Gem:
+                gem_counter = gem_counter + 1
+                if gem_counter == 3:
+                    # when all 3 gems are found a girl turns into a princess
+                    player.IMAGE = "Princess"
+                    GAME_BOARD.register(player)
+                    GAME_BOARD.set_el(player.x,player.y,player)
+                    GAME_BOARD.draw_msg("Wow! I am a princess now!")
+                    
 
 class DoorClosed(GameElement):
     IMAGE = "DoorClosed"
@@ -84,6 +114,10 @@ class Key(GameElement):
         player.inventory.append(self)
         GAME_BOARD.draw_msg("You have just acquired a key! You now have %d items." %(len(player.inventory)))
 
+
+class Wall(GameElement):
+    IMAGE = "Wall"
+    SOLID = True
 
 ####   End class definitions    ####
 def keyboard_handler():
@@ -129,7 +163,7 @@ def keyboard_handler():
 def initialize():
     #"""Put game initialization code here"""
  
-    rock_positions = [(2,1),(1,2),(3,2),(2,3)]
+    rock_positions = [(2,1),(1,2),(2,2)]
     rocks = []
 
     for pos in rock_positions:
@@ -158,11 +192,11 @@ def initialize():
 
     greengem = GreenGem()
     GAME_BOARD.register(greengem)
-    GAME_BOARD.set_el(1,0,greengem)
+    GAME_BOARD.set_el(3,0,greengem)
 
     orangegem = OrangeGem()
     GAME_BOARD.register(orangegem)
-    GAME_BOARD.set_el(2,0,orangegem)
+    GAME_BOARD.set_el(5,0,orangegem)
 
     doorclosed = DoorClosed()
     GAME_BOARD.register(doorclosed)
@@ -172,11 +206,16 @@ def initialize():
     GAME_BOARD.register(key1)
     GAME_BOARD.set_el(6,6,key1)
 
+    wall_positions = [(0,3),(1,3),(2,3),(4,3),(5,3),(6,3),]
+    walls = []
 
+    for pos in wall_positions:
+        wall = Wall()
+        GAME_BOARD.register(wall)
+        GAME_BOARD.set_el(pos[0],pos[1],wall)
+        walls.append(wall)
   
-
-            
-
+  
 
 
 
