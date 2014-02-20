@@ -20,7 +20,7 @@ class Rock(GameElement):
     SOLID = True
 
 class Character(GameElement): # step5
-    IMAGE = "Horns"
+    IMAGE = "Girl"
 
     def __init__(self):
         GameElement.__init__(self)
@@ -101,17 +101,20 @@ class Chest(GameElement):
     chest_collection = []
 
     def interact(self,player):
-        print player.inventory
         if  player.inventory == []:
             GAME_BOARD.draw_msg("There is nothing to store")
         else:
             self.SOLID = False
             self.chest_collection = player.inventory
-            print "chest" , self.chest_collection
-            print "player inv ", player.inventory
-            #player.inventory = []
+            print "Chest Inventory is " , self.chest_collection
+            player.inventory = []
             GAME_BOARD.draw_msg("Transfered everything from Player's inventory to Chest. Chest is in secret place now")
-      
+
+class WaterBlock(GameElement)               :
+    IMAGE = "WaterBlock"
+    SOLID = True
+
+
 ####   End class definitions    ####
 def keyboard_handler():
     direction = None
@@ -140,8 +143,7 @@ def keyboard_handler():
             
             if existing_el:
                 existing_el.interact(PLAYER)
-            print existing_el 
-
+            
             if existing_el is None or not existing_el.SOLID:
                 GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
                 GAME_BOARD.set_el(next_x,next_y,PLAYER)
@@ -177,7 +179,7 @@ def initialize():
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(1,5,PLAYER)
 
-    GAME_BOARD.draw_msg("This game is wicked awesome.") # step6
+    GAME_BOARD.draw_msg("Collect all 3 gems and see the magic!") # step6
 
     # Adding GEMS
     bluegem = Gem("BlueGem", "OrangeGem", "GreenGem")
