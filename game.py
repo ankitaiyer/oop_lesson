@@ -20,12 +20,13 @@ class Rock(GameElement):
     SOLID = True
 
 class Character(GameElement): # step5
-    IMAGE = "Girl"
+    #IMAGE = "Girl"
 
-    def __init__(self):
+    def __init__(self, IMAGE):
         GameElement.__init__(self)
         self.inventory = []
         self.gem_counter = 0
+        self.IMAGE = IMAGE
 
     #step 9 adding instance method
     def next_pos(self, direction):
@@ -51,7 +52,6 @@ class Gem(GameElement):
     def interact(self,player):
         player.inventory.append(self)
         player.gem_counter+=1
-        print player.gem_counter
         GAME_BOARD.draw_msg("You have just acquired a gem! You now have %d items."%(len(player.inventory)))
         if player.gem_counter == 3:
             # when all 3 gems are found a girl turns into a princess
@@ -133,10 +133,14 @@ def keyboard_handler():
         GAME_BOARD.draw_msg("Moving Right!")
 
     if direction:
+
+        new_x = PLAYER.x
+        new_y = PLAYER.y
+
         next_location = PLAYER.next_pos(direction)
         next_x = next_location[0]
         next_y = next_location[1]
-       
+
 
         if (0 <= next_x < GAME_WIDTH) and (0 <= next_y < GAME_HEIGHT): 
             existing_el = GAME_BOARD.get_el(next_x, next_y)
@@ -147,6 +151,8 @@ def keyboard_handler():
             if existing_el is None or not existing_el.SOLID:
                 GAME_BOARD.del_el(PLAYER.x, PLAYER.y)
                 GAME_BOARD.set_el(next_x,next_y,PLAYER)
+                GAME_BOARD.del_el(PLAYER2.x, PLAYER2.y)
+                GAME_BOARD.set_el(new_x, new_y,PLAYER2)
             elif type(existing_el) == DoorClosed:
                 GAME_BOARD.draw_msg("You just hit a closed door. You need a key to open and acquire this door.")    
             elif type(existing_el) == ShortTree:
@@ -175,9 +181,14 @@ def initialize():
 
     #Added character - GIRL for step5    
     global PLAYER
-    PLAYER = Character()
+    PLAYER = Character("Girl")
     GAME_BOARD.register(PLAYER)
     GAME_BOARD.set_el(1,5,PLAYER)
+
+    global PLAYER2
+    PLAYER2 = Character("Boy")
+    GAME_BOARD.register(PLAYER2)
+    GAME_BOARD.set_el(2,5,PLAYER2)
 
     GAME_BOARD.draw_msg("Collect all 3 gems and see the magic!") # step6
 
